@@ -1,0 +1,8 @@
+2023-12-24T10:29:15.301094+0800 ERROR [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。
+2023-12-24T10:29:15.308615+0800 ERROR module 'scapy' has no attribute 'sniff'
+2023-12-24T10:29:43.657491+0800 ERROR [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。
+2023-12-24T10:29:43.658996+0800 ERROR module 'scapy' has no attribute 'sniff'
+2023-12-24T10:35:52.899639+0800 ERROR [WinError 10022] 提供了一个无效的参数。
+2023-12-24T10:37:20.542019+0800 ERROR module 'scapy' has no attribute 'sniff'
+2023-12-24T10:40:38.034138+0800 ERROR module 'scapy' has no attribute 'sniff'
+2023-12-24T10:42:13.590186+0800 ERROR module 'scapy' has no attribute 'sniff'
