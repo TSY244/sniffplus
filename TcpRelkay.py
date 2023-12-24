@@ -6,9 +6,6 @@ import xTrace
 '''
 TCP forwarding
 '''
-'''
-    从channel中获取TCP包，然后转发
-'''
 
 
 class TCPForwarding:
@@ -16,6 +13,9 @@ class TCPForwarding:
         self.channel = channel
 
     def forwarding(self):
+        """
+        forwarding the packet
+        """
         try:
             while True:
                 # get the packet from the channel
@@ -23,10 +23,12 @@ class TCPForwarding:
                     continue
                 pkg = self.channel.pop()
                 # get the five tuple of the packet
-                sip, dip, sport, dport, flags = xTrace.MsgShare.get_five_tuple(pkg)
-                # 使用scapy构造一个TCP包
-                send_pkg = scapy.IP(src=sip, dst=dip) / scapy.TCP(sport=sport, dport=dport, flags=flags)
-
+                sip, dip, sport, dport, flags = xTrace.Sniffer.get_five_tuple(pkg)
+                mac = xTrace.Sniffer.get_mac(pkg)
+                # use scapy to send the packet
+                send_pkg = scapy.Ether(src=mac) / scapy.IP(src=sip, dst=dip) / scapy.TCP(sport=sport, dport=dport,
+                                                                                         flags=flags)
+                scapy.send(send_pkg, verbose=False)
         except Exception as e:
             loguru.logger.error(e)
     

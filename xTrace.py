@@ -1,8 +1,9 @@
-import socket
 import scapy.all as scapy
 import loguru
 import MsgShare
 import threading
+import socket
+from time import sleep
 '''
     Sniffer 
     This is a simple sniffer, which can only capture packets from a specific port.
@@ -19,80 +20,50 @@ class Sniffer:
         Impersonate a server and wait for connections.
     '''
 
-    def __init__(self, port, channel: MsgShare.Channel):
+    def __init__(self, ip,port, channel: MsgShare.Channel):
         self.port = port
-        try:
-            # self.socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_IP)
-            self.socket=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-            self.socket.bind(('127.0.0.1', self.port))
-            self.socket.listen(1)
-            # self.socket.ioctl(socket.SIO_RCVALL, socket.RCVALL_ON)  # open the promiscuous mode
-        except Exception as e:
-            loguru.logger.error(e)
+        self.ip=ip
         self.channel = channel
 
-    def socket_accept(self):
+    def sniff(self):
         '''
-        accept the connection
+        sniff the packets from the specific port
         '''
         try:
-            self.socket.accept()
+            scapy.sniff(filter=f'tcp port {self.port}', iface='WLAN', count=0, prn=lambda x: self.channel.put(x))
         except Exception as e:
             loguru.logger.error(e)
-    def get_host_ip(self):
-        """
-        find the ip address of the host
-        return: ip
-        """
+
+    @staticmethod
+    def get_local_ip():
+        '''
+        get the local ip address
+        '''
         try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            s.connect(('8.8.8.8', 80))
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # 
+            s.connect(('8.8.8.8', 80)) 
             ip = s.getsockname()[0]
         except Exception as e:
             loguru.logger.error(e)
         finally:
             s.close()
-        return ip
 
-    def sniff(self):
-        '''
-        
-        sniff the packets from the specific port
-        '''
-        try:
-            while True:
-
-                # use scapy to parse the packet
-                pkg = scapy.sniff(filter=f'tcp port {self.port}',iface='WLAN',count=0,prn=self.callback)
-        except Exception as e:
-            loguru.logger.error(e)
-        finally:
-            # self.socket.ioctl(socket.SIO_RCVALL, socket.RCVALL_OFF)  # close the promiscuous mode
-            self.socket.close()
-
-    def callback(self,pkg):
-        self.channel.put(pkg)
-        print(pkg)
     @staticmethod
-    def tracert(self, pkg):
+    def tracert(pkg):
         '''
         trace the route of the packet
         '''
-        sip, dip, sport, dport, flags = self.get_five_tuple(pkg)
+        sip, dip, sport, dport, flags = Sniffer.get_five_tuple(pkg)
         ack, seq = pkg['TCP'].ack, pkg['TCP'].seq
-        send_pkg = scapy.IP(src=dip, dst=sip) / scapy.TCP(sport=dport, dport=sport, flags='R', ack=ack, seq=seq)
+        send_pkg = scapy.IP(src=dip, dst=sip) / scapy.TCP(sport=dport, dport=sport, flags='R', ack=ack+1, seq=seq)
         for i in range(1, 128):
             # send the packet
-            ret = scapy.sr1(send_pkg, timeout=1)
-            if ret is None:
-                loguru.logger.info("the " + str(i) + "th hop is " + str(dip))
+            send_pkg.ttl = i
+            ret = scapy.sr1(send_pkg, timeout=1, verbose=False)
+            if ret == None or ret.src==sip:
+                # print("route num is %d" % (i-1))
+                loguru.logger.info(f"from {sip} to {dip} route num is {i-1}")
                 break
-            elif ret['IP'].src == dip:
-                loguru.logger.info("the " + str(i) + "th hop is " + str(dip))
-                break
-            else:
-                loguru.logger.info("the " + str(i) + "th hop is " + str(ret['IP'].src))
-                continue
 
     @staticmethod
     def get_five_tuple(pkg):
@@ -120,18 +91,17 @@ class Sniffer:
         finally:
             return ret
 
-
-def sniffer():
-    scapy.sniff(filter=f'tcp',iface='WLAN',count=0,prn=lambda x:print(x))
-
-sniffer()
 # def main():
 #     channel = MsgShare.Channel()
-#     ac_thread=threading.Thread(target=Sniffer.socket_accept)
-#     ac_thread.start()
-#     sniffer = Sniffer(11234, channel)
-#     sniffer.sniff()
-
+#     sniffer = Sniffer(Sniffer.get_local_ip(),80, channel)
+#     thread_for_sniffer = threading.Thread(target=sniffer.sniff)
+#     thread_for_sniffer.start()
+#     while True:
+#         if channel.empty():
+#             continue
+#         pkg = channel.top()
+#         Sniffer.tracert(pkg)
+#         sleep(1)
 
 # if __name__ == "__main__":
 #     main()

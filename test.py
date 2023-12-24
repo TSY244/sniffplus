@@ -1,21 +1,29 @@
-import socket
+import uuid
 
-def get_host_ip():
-    """
-    查询本机ip地址
-    :return: ip
-    """
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # 
-        s.connect(('8.8.8.8', 80)) # 
-        ip = s.getsockname()[0] # 
-    finally:
-        s.close()
+def get_mac_address():
+    mac=uuid.UUID(int=uuid.getnode()).hex[-12:]
+    return ":".join([mac[e:e+2] for e in range(0,11,2)])
 
-    return ip
+print(get_mac_address())
 
-if __name__ == '__main__':
-    print(get_host_ip())
+# import socket
+
+# def get_host_ip():
+#     """
+#     查询本机ip地址
+#     :return: ip
+#     """
+#     try:
+#         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # 
+#         s.connect(('8.8.8.8', 80)) # 
+#         ip = s.getsockname()[0] # 
+#     finally:
+#         s.close()
+
+#     return ip
+
+# if __name__ == '__main__':
+#     print(get_host_ip())
 
 
 # import threading, time

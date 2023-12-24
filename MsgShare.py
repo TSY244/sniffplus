@@ -2,7 +2,7 @@ import threading
 from multiprocessing import Queue
 
 '''
-主要用于五元组信息的传输
+used for sharing message between threads
 '''
 
 
@@ -17,7 +17,7 @@ class Channel:
         '''
         with self.lock:
             self.queue.append(item)
-    def get(self):
+    def top(self):
         '''
         return:
             the first element in the queue, but not pop it
