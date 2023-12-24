@@ -6,3 +6,7 @@
 2023-12-24T10:37:20.542019+0800 ERROR module 'scapy' has no attribute 'sniff'
 2023-12-24T10:40:38.034138+0800 ERROR module 'scapy' has no attribute 'sniff'
 2023-12-24T10:42:13.590186+0800 ERROR module 'scapy' has no attribute 'sniff'
+2023-12-24T15:36:01.410684+0800 ERROR list index out of range
+2023-12-24T15:38:33.326854+0800 ERROR list index out of range
+2023-12-24T15:44:09.003741+0800 ERROR 'NoneType' object has no attribute 'psrc'
+2023-12-24T15:44:37.891651+0800 ERROR can't get the mac address of 127.0.0.1

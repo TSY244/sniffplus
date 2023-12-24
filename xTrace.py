@@ -90,6 +90,34 @@ class Sniffer:
             loguru.logger.error(e)
         finally:
             return ret
+    @staticmethod
+    def get_mac_by_ip(ip):
+        '''
+        get the mac address of the packet
+        pkg is a scapy packet
+        '''
+        try:
+            arp_pkg=scapy.Ether(dst='ff:ff:ff:ff:ff:ff')/scapy.ARP(pdst=ip)
+            ret = scapy.srp1(arp_pkg,timeout=1,verbose=False)
+            if ret==None:
+                loguru.logger.error(f"can't get the mac address of {ip}")
+                return None
+            if ip==ret.psrc:
+                loguru.logger.info(f"get the mac address of {ip} is {ret.hwsrc}")
+                return ret.hwsrc
+            else:
+                loguru.logger.error(f"can't get the mac address of {ip}")
+                return None
+        except Exception as e:
+            loguru.logger.error(e)
+
+            
+    
+
+
+# test=Sniffer.get_mac_by_ip('127.0.0.1')
+# print(test)
+
 
 # def main():
 #     channel = MsgShare.Channel()

@@ -24,3 +24,9 @@
 > 用于arp欺骗
 >
 > 需要 目标IP 目标MAC 网关IP 网关MAC
+
+# 使用
+需要填写欺骗的服务器的ip
+您需要在main.py处将
+`# target_ip, target_mac = #!!input the target ip and mac`
+取消注释，然后填写ip，我会根据这个获取该服务器的mac，随后我将对其进行arp欺骗
